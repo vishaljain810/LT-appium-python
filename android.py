@@ -9,7 +9,7 @@ desired_caps = {
     "deviceName": "Galaxy S20",
     "platformName": "Android",
     "platformVersion": "10",
-    "app": "lt://proverbial-android",  # Enter app_url here
+    # "app": "lt://proverbial-android",  # Enter app_url here
     "isRealMobile": True,
     "build": "Python Vanilla Android",
     "name": "Sample Test - Python",
@@ -17,6 +17,14 @@ desired_caps = {
     "visual": True,
     "video": True
 }
+
+app_url = os.environ.get('LT_APP_ID')
+
+# Set the app URL based on the presence of the environment variable
+if app_url:
+    desired_caps["app"] = app_url
+else:
+    desired_caps["app"] = "lt://proverbial-android"
 
 
 def startingTest():
@@ -30,10 +38,15 @@ def startingTest():
         accesskey = "accesskey"
     else:
         accesskey = os.environ.get("LT_ACCESS_KEY")
+    if os.environ.get("LT_GRID_URL") is None:
+        # Enter LT accesskey here if environment variables have not been added
+        gridurl= "mobile-hub.lambdatest.com/wd/hub"
+    else:
+        gridurl= os.environ.get("LT_GRID_URL")    
 
     try:
         driver = webdriver.Remote(desired_capabilities=desired_caps, command_executor="https://" +
-                                  username+":"+accesskey+"@mobile-hub.lambdatest.com/wd/hub")
+                                  username+":"+accesskey+"@"+gridurl)
         colorElement = WebDriverWait(driver, 20).until(EC.element_to_be_clickable(
             (MobileBy.ID, "com.lambdatest.proverbial:id/color")))
         colorElement.click()
